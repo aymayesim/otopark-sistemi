@@ -1,0 +1,204 @@
+#include <iostream>
+#include <stdlib.h>
+#include <string.h>
+#include <fstream>
+using namespace std;
+
+void Arabaekleme();
+void Arabalisteleme();
+void Arabasilme();
+void Arabaarama();
+
+struct Araba
+{
+	string marka;
+	string model;
+	string plaka;
+};
+
+Araba arb;
+int main()
+{
+	char secim;
+	do
+	{
+		system("cls");
+		cout<<"hoşgeldiniz"<<endl;
+		cout<<"secim yapınız"<<endl;
+		cout<<"1-araba ekleme"<<endl;
+		cout<<"2-araba listeleme"<<endl;
+		cout<<"3-araba silme"<<endl;
+		cout<<"4-araba arama"<<endl;
+		cout<<"tercih giriniz"<<endl;
+		secim=getche();
+		switch(secim)
+		{
+			case '1':
+				{
+					Arabaekleme();
+					break;
+				}
+			case '2':
+			{
+				Arabalisteleme();
+				break;
+			}
+			case '3':
+				{
+					Arabasilme();
+				}
+				case '4':
+					{
+						Arabaarama();
+						break;
+					}
+		}
+		cout<<"ana menüye dönmek ister misiniz?"<<endl;
+		secim=getche();
+	}
+	while(secim=='e'|secim=='E');
+	
+	return 0;
+	
+}
+void Arabaekleme()
+{
+	char secim;
+	ofstream yaz("araba.dat",ios::binary |ios::app);
+	do
+	{
+	
+	cout<<"araba markası gir"<<endl;
+	cin>>arb.marka;
+	cout<<"araba modeli gir"<<endl;
+	cin>>arb.model;
+	cout<<"araba plakası gir"<<endl;
+	cin>>arb.plaka;
+	
+	yaz.write((char*)&arb,sizeof(arb));
+	
+	cout<<"araba eklemek ister misiniz"<<endl;
+	secim=getche();
+}
+while(secim=='e');
+
+yaz.close();	
+}
+
+void Arabalisteleme()
+{
+	char secim;
+	ifstream oku("araba.dat",ios::binary |ios::app);
+	oku.seekg(0,ios::end);
+	int adet=oku.tellg()/sizeof(arb);
+	if(adet>0);
+	{
+		for(int i=0;i<adet;i++)
+		{
+			oku.read((char*)&arb,sizeof(arb));
+			
+			cout<<"arabanın modeli:"<<arb.model<<endl;
+			cout<<"arabanın markası:"<<arb.marka<<endl;
+			cout<<"arabanın plakası"<<arb.plaka<<endl;
+			
+		}
+	}
+	
+	
+}
+
+void Arabaarama()
+{
+	char secim;
+		ifstream oku("araba.dat",ios::binary |ios::app);
+	oku.seekg(0,ios::end);
+	char arbplaka[7];
+	cout<<"aranacak arabanın plakasını girin"<<endl;
+	cin>>arbplaka;
+	int adet=oku.tellg()/sizeof(arb);
+    if(adet>0);
+	{
+		for(int i=0;i<adet;i++)
+		{
+			oku.seekg(i*sizeof(arb));
+			oku.read((char*)&arb,sizeof(arb));
+			if(strcmp(arb.plaka,arbplaka)==0)
+			{
+			
+		     cout<<"bulunan arabanın modeli"<<arb.model<<endl;
+		     cout<<"bulunan arabanın markası"<<arb.marka<<endl;
+		     
+		}
+		else
+		cout<<"kayıt bulunamadı"<<endl;
+		}
+	}
+}
+
+
+void Arabasilme()
+{
+	char secim;
+		ifstream oku("araba.dat",ios::binary |ios::app);
+	oku.seekg(0,ios::end);
+	char arbplaka[7];
+	cout<<"silinecek arabanın plakasını girin"<<endl;
+	cin>>arbplaka;
+	int adet=oku.tellg()/sizeof(arb);
+    if(adet>0);
+    bool var=false;
+	{
+		for(int i=0;i<adet;i++)
+		{
+			oku.seekg(i*sizeof(arb));
+			oku.read((char*)&arb,sizeof(arb));
+			if(strcmp(arb.plaka,arbplaka)==0)
+		
+			{
+			
+			cout<<"silinecek arabanın modeli:"<<arb.model<<endl;
+			cout<<"silinecek arabanın markası:"<<arb.marka<<endl;
+			
+		cout<<"silinecek araba bu mu (e/h)"<<endl;
+		secim=getche();
+		if(secim=='h')
+		{
+				Araba y_arb;
+			ofstream y_yaz("yedek.dat",ios::binary|ios::app)
+			strcpy(y_arb.model,arb.model);
+			strcpy(y_arb.marka,arb.marka);
+			strcpy(y_arb.plaka,arb.plaka);
+			y_yaz.write((char*)&arb,sizeof(arb));
+			y_yaz.close();
+		
+		}
+		else if(secim=='e')
+		{
+			var=true;
+		}
+		}
+		else
+		{
+			//silinmeyecek arabalar
+			Araba y_arb;
+			ofstream y_yaz("yedek.dat",ios::binary|ios::app)
+			strcpy(y_arb.model,arb.model);
+			strcpy(y_arb.marka,arb.marka);
+			strcpy(y_arb.plaka,arb.plaka);
+			y_yaz.write((char*)&arb,sizeof(arb));
+			y_yaz.close();
+		}
+		
+		}
+		
+		if(var)
+		{
+		remove("araba.dat");
+		rename("yedek.dat","araba.dat");
+		cout<<"kayıt silindi"<<endl;
+		
+		}
+		else
+		remove("yedek.dat");
+	}
+}
